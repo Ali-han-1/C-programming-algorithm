@@ -1,0 +1,366 @@
+// kütüphanelerimizi tanımlıyoruz bazı hazır fonksiyonları yazmayıp  kullanabilmek için 
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<ctype.h>
+
+//global değişken tanımlıyoruz 
+
+#define size 10
+
+//öğrenci bilgilerini saklama için struct tanımlıyoruz 
+
+struct yazdirma
+{
+    int ogrenciNo;
+    char ad[20];
+    char soyad[20];
+    float vize;
+    float final;
+    float ortalama;
+};
+
+// fonksiyon prototipleri 
+
+int menu ();                                                                // menü 
+
+void student_Ekle (struct yazdirma shd[],int i);                            // ögrenci ekleme fonksiyonumuz 
+
+int islemler();                                                             //
+
+void student_ortalama_hesaplama(struct yazdirma shd[],int i);               // verilen not tutma ve notlara göre ortalama hesaplama
+
+void harf_notu_hesaplama(float gelen_ortalama);                             // aralıklara göre har notu hesaplama 
+
+void student_veri_isleme_okuma(struct yazdirma shd[],int i);                // veri okuma 
+
+void student_veri_isleme_guncelleme(struct yazdirma shd[],int i);           //yazma
+
+void ogr_veri_kaydet (struct yazdirma shd[],int i);
+
+void text_olarak_isleme(struct yazdirma shd[], int i);
+
+int verileri_yukle(struct yazdirma shd[]);
+
+
+int sadece_harf_mi(char dizi[]);
+
+// main fonksiyon 
+
+int main()
+{
+     
+    int deger;
+    int deger_2;
+    struct yazdirma shd[size];
+    int i = verileri_yukle(shd);
+
+    printf(" ogrenci bilgileri kaydedildi ");
+    
+    while (1)
+    {
+    deger = menu();
+    
+    switch (deger)
+    {
+    case 1:
+        student_Ekle(shd, i); 
+        student_ortalama_hesaplama(shd, i);
+        harf_notu_hesaplama(shd[i].ortalama); 
+        ogr_veri_kaydet(shd,i);
+        i++;
+        break;
+    case 2:
+        student_veri_isleme_okuma(shd, i);
+        break;
+    case 3:
+        student_veri_isleme_guncelleme(shd, i);
+        break;
+    case 4:
+        exit(0);
+        break;
+    
+    default:
+        printf(" \n !! geçersiz giris !! \n  ");
+        break;
+    }
+    
+  }
+  return 0 ;
+}
+
+
+int sadece_harf_mi(char dizi[]) {
+    for (int j = 0; dizi[j] != '\0'; j++) {
+        if (!isalpha(dizi[j])) {
+            return 0; // Harf dışında bir karakter (rakam, sembol vb.) bulundu
+        }
+    }
+    return 1; // Hepsi harf
+}
+//
+
+int menu(){
+    
+    int deger = 0 ; 
+
+    printf("\n ~~~~~~~~~~ menu ~~~~~~~~~~~~~~ \n");
+    printf(" \n 1. Not girme \n");
+    printf(" \n 2. Not okuma  \n");
+    printf(" \n 3. Not guncelleme \n");
+    printf(" \n 4. cikis \n");   
+    printf(" \n seciminiz : ");
+    scanf("%d",&deger);
+
+    return deger ;
+
+}
+
+//
+
+
+void student_Ekle (struct yazdirma shd[], int i)
+{
+    // 1) Öğrenci No Giriş Kontrolü
+    while(1)
+    {
+        printf("\nogrenci no giriniz : ");
+        // Sayı dışında bir şey girilirse scanf 0 döner
+        if (scanf("%d", &shd[i].ogrenciNo) == 1) 
+        {
+            break; // Geçerli sayı girildi, döngüden çık
+        } 
+        else 
+        {
+            printf("Hata! Lutfen sadece rakamlardan olusan bir numara girin.\n");
+            while (getchar() != '\n'); // Hatalı karakterleri temizle (sonsuz döngüyü önler)
+        }
+    }
+    
+    // 2) Ad ve Soyad Harf Kontrolü
+    while (1)
+    {
+        printf("\nogrenci adi giriniz : ");
+        scanf("%19s", shd[i].ad);
+        
+        printf("\nsoyad giriniz : ");
+        scanf("%19s", shd[i].soyad);
+        
+        // Her iki girdi de sadece harflerden mi oluşuyor?
+        if (sadece_harf_mi(shd[i].ad) && sadece_harf_mi(shd[i].soyad))
+        {
+            break; // İkisi de sadece harf ise döngüyü bitir
+        }
+        else
+        {
+            printf("Hata! Ad ve soyad sadece harflerden olusmalidir. Tekrar deneyin.\n");
+        }
+    }
+}
+
+//
+
+void student_ortalama_hesaplama(struct yazdirma shd[],int i){
+
+    printf(" \nvize notu giriniz ");
+    scanf("%f",&shd[i].vize);
+    printf(" \nfinal notunu giriniz ");
+    scanf("%f",&shd[i].final);
+    shd[i].ortalama = (shd[i].vize*0.40 + shd[i].final*0.60);
+    printf("\n orttalama = %f",shd[i].ortalama);
+
+}
+
+//
+
+void harf_notu_hesaplama(float gelen_ortalama){
+
+     int kucultme = (int)(gelen_ortalama / 10);
+    
+    if ( kucultme == 10 || kucultme == 9 )
+    {
+        printf(" \n Harf Notu : AA \n ");
+    }
+    else if ( kucultme == 8 )
+    {
+        printf(" \n Harf Notu : BA \n ");
+    }
+    else if ( kucultme == 7 )
+    {
+        printf(" \n Harf Notu : BB \n ");
+    }
+    else if ( kucultme == 6 )
+    {
+        printf(" \n Harf Notu : CB \n ");
+    }
+    else if ( kucultme == 5 )
+    {
+        printf(" \n Harf Notu : CC \n ");
+    }
+    else
+    {
+        printf(" \n Harf Notu : FF \n ");
+    }
+
+}
+
+//
+
+void student_veri_isleme_okuma(struct yazdirma shd[],int i){
+
+    int girilen_NO = 0;
+    int okunan_id;
+    char okunan_ad[20];
+    char okunan_soyad[20];
+    float okunan_vize, okunan_final, okunan_ortalama;
+    int tarama_sonuc = 0;
+
+    printf(" \n Hangi numarali ogrencinin notunu okumak istiyorsun : ");
+    scanf("%d", &girilen_NO);
+    
+    FILE *dosya = fopen("notlar.txt", "r");
+    
+    if (dosya == NULL) {
+        printf("\n Hata: Henuz kaydedilmis bir ogrenci (notlar.txt) yok!\n");
+        return; 
+    }
+
+    while (fscanf(dosya, "ID: %d Ad: %19s Soyad: %19s Vize: %f Final: %f Ortalama: %f\n", 
+            &okunan_id, okunan_ad, okunan_soyad, &okunan_vize, &okunan_final, &okunan_ortalama) != EOF) 
+    {
+        
+        if (girilen_NO == okunan_id)
+        {
+            printf("\n --- Ogrencinin Bilgileri ---\n");
+            printf(" ID: %d\n Ad: %s\n Soyad: %s\n Ortalama: %.2f\n", okunan_id, okunan_ad, okunan_soyad, okunan_ortalama);
+            
+            tarama_sonuc = 1; 
+            harf_notu_hesaplama(okunan_ortalama);
+            break; 
+        } 
+    }
+    
+    
+    if (tarama_sonuc == 0) {
+         printf("\n !! Bu numaraya ait ogrenci bulunamadi !!\n");
+    }
+
+    fclose(dosya);
+}                              
+
+//
+
+int islemler(){
+
+int deger_2 = 0 ;
+
+printf(" \n ~~~~~~~~ islemler ~~~~~~~~~ \n ");
+printf(" \n 1. vize  ");
+printf(" \n 2. final ");
+printf(" \n 3 geri ");
+printf(" \n seciminiz : ");
+scanf("%d",&deger_2);
+
+return deger_2;
+
+}
+
+//
+
+void ogr_veri_kaydet(struct yazdirma shd[], int i) {
+    
+    FILE *dosya = fopen("notlar.txt", "a");
+
+    if (dosya == NULL) {
+        printf("\n Hata: Dosya acilamadi!\n");
+        return; 
+    }
+    fprintf(dosya, "ID: %d Ad: %s Soyad: %s Vize: %.2f Final: %.2f Ortalama: %.2f\n", 
+            shd[i].ogrenciNo, shd[i].ad, shd[i].soyad, shd[i].vize, shd[i].final, shd[i].ortalama);
+
+    fclose(dosya); 
+
+    printf("\n -> Ogrenci bilgileri notlar.txt dosyasina basariyla kaydedildi!\n");
+}
+
+//
+
+void student_veri_isleme_guncelleme(struct yazdirma shd[], int i) {
+    int girilen_NO = 0;
+    int islem_secimi;
+    int tarama_sonuc_2 = 0;
+    int ogrenci_index = -1;
+
+    printf("\n Guncellemek istediginiz ogrencinin numarasini (ID) giriniz : ");
+    scanf("%d", &girilen_NO);
+
+    for (int j = 0; j < i; j++) {
+        if (girilen_NO == shd[j].ogrenciNo) {
+           tarama_sonuc_2 = 1;
+            
+            ogrenci_index = j;
+            break;
+        }
+    }
+
+    if (tarama_sonuc_2 == 0) {
+        printf("\n !! Bu numaraya ait ogrenci dizide bulunamadi !!\n");
+        return; 
+    }
+
+    islem_secimi = islemler();
+
+    if (islem_secimi == 1) {
+        printf(" \n Yeni Vize Notunu Giriniz: ");
+        scanf("%f", &shd[ogrenci_index].vize);
+    } 
+    else if (islem_secimi == 2) {
+        printf(" \n Yeni Final Notunu Giriniz: ");
+        scanf("%f", &shd[ogrenci_index].final);
+    } 
+    else if (islem_secimi == 3) {
+         return;
+    }
+    else {
+        printf(" \n Gecersiz secim.\n");
+        return;
+    }
+
+    shd[ogrenci_index].ortalama = (shd[ogrenci_index].vize * 0.40) + (shd[ogrenci_index].final * 0.60);
+    printf("\n Yeni Ortalama: %.2f\n", shd[ogrenci_index].ortalama);
+
+    harf_notu_hesaplama(shd[ogrenci_index].ortalama); 
+    
+    text_olarak_isleme(shd, i);
+   
+}
+
+//
+
+void text_olarak_isleme(struct yazdirma shd[], int i){
+FILE *fp = fopen("notlar.txt","w"); 
+if (fp == NULL) return;
+
+for (int j = 0; j < i; j++){
+    fprintf(fp, "ID: %d Ad: %s Soyad: %s Vize: %.2f Final: %.2f Ortalama: %.2f\n", shd[j].ogrenciNo, shd[j].ad, shd[j].soyad, shd[j].vize, shd[j].final, shd[j].ortalama);
+}
+fclose(fp);
+printf("\n -> Tum veriler notlar.txt dosyasina kalici olarak islendi!\n");
+}
+
+int verileri_yukle(struct yazdirma shd[])
+{
+    FILE *dosya = fopen("notlar.txt", "r");
+    if (dosya == NULL) return 0; 
+
+    int count = 0;
+    
+    while (fscanf(dosya, "ID: %d Ad: %s Soyad: %s Vize: %f Final: %f Ortalama: %f\n", 
+           &shd[count].ogrenciNo, shd[count].ad, shd[count].soyad, 
+           &shd[count].vize, &shd[count].final, &shd[count].ortalama) != EOF) {
+        count++;
+        if (count >= size) break; 
+    }
+    fclose(dosya);
+    return count; 
+}
